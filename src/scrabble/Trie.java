@@ -31,6 +31,10 @@ public class Trie {
             return children[index];
         }
 
+        public Node[] getAllChildren(){
+            return children;
+        }
+
     }
 
     private Node rootNode;
@@ -69,5 +73,9 @@ public class Trie {
             parentNode = parentNode.getChildren(index);
         }
         return parentNode.isWord;
+    }
+
+    public Node getRootNode() {
+        return rootNode;
     }
 }

@@ -25,6 +25,10 @@ public class Dictionary {
         return trie.isWord(word);
     }
 
+    public Trie getTrie() {
+        return trie;
+    }
+
     public static void main(String[] args) {
         Dictionary dictionary = new Dictionary("sowpods.txt");
         System.out.println(dictionary.doesWordExist("overfl"));
