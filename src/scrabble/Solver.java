@@ -23,14 +23,14 @@ public class Solver {
         nodes = new LinkedList<>();
     }
 
-    private void leftPart(String partialWord, Trie.Node node, int limit, int x, int y, boolean isRotated){
+    private void leftPart(String partialWord, Trie.Node node, int limit, int x, int y, boolean isRotated, int anchorX, int anchorY){
         if(limit>0){
             for (int i = 0; i<26; i++){
                 Trie.Node n = node.getChildren(i);
                 Character c = (char) ('a' + i);
                 if(n != null && rack.contains(c)){
                     rack.remove(c);
-                    leftPart(partialWord+c,n,limit-1, x, y,isRotated);
+                    leftPart(partialWord+c,n,limit-1, x, y,isRotated, anchorX, anchorY);
                     rack.add(c);
                 }
             }
@@ -39,7 +39,10 @@ public class Solver {
         nodes.add(node);
       //  System.out.println("From " + partialWord);
      //   System.out.println(rack);
-        extendRight(partialWord,node,x,y, isRotated);
+        if(board.legalVerticalMove(partialWord,x,y-1)){
+            extendRight(partialWord,node,x,y, isRotated,anchorX, anchorY);
+       }
+
 //        for (int i = 0; i<partialWord.length(); i++){
 //            rack.add(partialWord.charAt(i));
 //        }
@@ -48,7 +51,25 @@ public class Solver {
 
 
 
-    public void extendRight(String partialWord, Trie.Node node, int x, int y, boolean isRotated){
+    public void extendRight(String partialWord, Trie.Node node, int x, int y, boolean isRotated, int anchorX, int anchorY){
+        if((x> anchorX || y> anchorY) && !board.existChar(x,y) && node.isWord()){
+            if(partialWord.equals("lemoned")){
+                System.out.println(x+" "+y);
+            }
+
+            //    System.out.println("word: "+partialWord+" is: "+isRotated);
+            LinkedHashMap<int[],Boolean> map = new LinkedHashMap<>();
+            LinkedList<int[]> index = board.getWordCoordinates(x,y-1,isRotated,partialWord);
+            boolean allTilesUsed = false;
+            if(rack.size() == 0){
+                allTilesUsed = true;
+            }
+            int score = board.getTotalScore(index,partialWord,allTilesUsed);
+            map.put(new int[]{x,y-1,score}, isRotated);
+            LinkedHashMap<String, LinkedHashMap<int[], Boolean>> wordXYMap = new LinkedHashMap<>();
+            wordXYMap.put(partialWord, map);
+            words.put(score,wordXYMap);
+        }
         //System.out.println("partial "+ partialWord + " x "+x+" y "+y);
         if(y>=0 && y<board.getDimension()){
             if(!board.existChar(x,y)){
@@ -56,17 +77,8 @@ public class Solver {
                     Trie.Node n = node.getChildren(i);
                     Character c = (char)('a'+i);
                     if(n != null && rack.contains(c) && board.legalAcrossMove(x,y,c)){
-                        if(!board.existChar(x,y+1) && n.isWord()){
-                            //    System.out.println("word: "+partialWord+" is: "+isRotated);
-                            LinkedHashMap<int[],Boolean> map = new LinkedHashMap<>();
-                            int score = board.getScore(partialWord+c,x,y,'L',isRotated);
-                            map.put(new int[]{x,y,score}, isRotated);
-                            LinkedHashMap<String, LinkedHashMap<int[], Boolean>> wordXYMap = new LinkedHashMap<>();
-                            wordXYMap.put(partialWord+c, map);
-                            words.put(score,wordXYMap);
-                        }
                         rack.remove(c);
-                        extendRight(partialWord+c,n,x,y+1,isRotated);
+                        extendRight(partialWord+c,n,x,y+1,isRotated,anchorX,anchorY);
                         rack.add(c);
           //              System.out.println(partialWord+"==  "+x+"==  "+y);
                     }
@@ -75,7 +87,7 @@ public class Solver {
                 char c = board.getChar(x,y);
                 Trie.Node n = node.getChildren(c-'a');
                 if(n != null){
-                    extendRight(partialWord+c,n,x,y+1, isRotated);
+                    extendRight(partialWord+c,n,x,y+1, isRotated,anchorX,anchorY);
                 }
             }
         }
@@ -101,13 +113,13 @@ public class Solver {
                             break;
                         }
                         System.out.println("Anchor points "+i+" "+j);
-                        extendRight(leftPart,node,i,j,board.isRotated());
+                        extendRight(leftPart,node,i,j,board.isRotated(),i,j);
                     }else {
                         System.out.println("Anchor point "+i+" "+j);
                         if(leftEmptySqr>=7){
-                            leftPart("",dictionary.getTrie().getRootNode(),7,i,j,board.isRotated());
+                            leftPart("",dictionary.getTrie().getRootNode(),7,i,j,board.isRotated(),i,j);
                         }else {
-                            leftPart("",dictionary.getTrie().getRootNode(),leftEmptySqr,i,j,board.isRotated());
+                            leftPart("",dictionary.getTrie().getRootNode(),leftEmptySqr,i,j,board.isRotated(),i,j);
                         }
                     }
                 }
@@ -131,14 +143,14 @@ public class Solver {
 
 
     public static void main(String[] args) {
-        Board board = new Board("b.txt");
+        Board board = new Board("d.txt");
         board.fillBoard();
         Dictionary dictionary = new Dictionary("sowpods.txt");
         Solver solver = new Solver(board,dictionary);
-        solver.rack.add('l');
-        solver.rack.add('o');
-        solver.rack.add('m');
-        solver.rack.add('e');solver.rack.add('n');solver.rack.add('d');solver.rack.add('e');
+        solver.rack.add('n');
+        solver.rack.add('t');
+        solver.rack.add('n');
+        solver.rack.add('b');solver.rack.add('t');solver.rack.add('o');solver.rack.add('i');
         long start = System.currentTimeMillis();
         solver.findAllPossWords();
         //Collections.sort(solver.words);
@@ -156,7 +168,7 @@ public class Solver {
         long end = System.currentTimeMillis();
         long runtime = end-start;
         System.out.println(runtime);
-        HashMap<String, LinkedHashMap<int[],Boolean>> map = solver.words.get(110);
+        HashMap<String, LinkedHashMap<int[],Boolean>> map = solver.words.get(24);
         String string = map.keySet().toArray()[0].toString();
         HashMap<int[],Boolean> map2 = map.get(string);
         Set<int[]> set = map2.keySet();
@@ -167,7 +179,7 @@ public class Solver {
         System.out.println(string + " "+isRotated);
         System.out.println(board.isRotated());
         System.out.println("x: "+x+" y: "+y);
-        for(int[] ar: board.getWordCoordinates(x,y,false,string)){
+        for(int[] ar: board.getWordCoordinates(x,y,isRotated,string)){
             System.out.println(ar[0]+"   "+ar[1]);
         }
         //board.rotateBoard();

@@ -32,6 +32,6 @@ public class Dictionary {
     public static void main(String[] args) {
         Dictionary dictionary = new Dictionary("sowpods.txt");
         System.out.println(dictionary.doesWordExist("overfl"));
-        System.out.println(dictionary.doesWordExist("overflow"));
+        System.out.println(dictionary.doesWordExist("olemoned"));
     }
 }
