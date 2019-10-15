@@ -14,9 +14,23 @@ public class Board {
     private String[][] anchorPoints;
     private ScoreFrequency scoreFrequency;
     private Dictionary dictionary;
+    private boolean isHumanMovingHorizontal;
+    private boolean isHumanCurrentlyPlaying;
+    private LinkedList<int[]> humanCurrMove;
+    private char humanCurrentPlayingChar;
+    private boolean newCharSelected;
+    private String wordPlayedByHuman;
+    private LinkedList<int[]> humanMoveIndexes;
+    private boolean isFirstMove;
+
 
     Board(String boardPath){
+        this.isFirstMove = true;
+        this.newCharSelected = false;
+        this.isHumanMovingHorizontal = false;
         this.boardConfig = new LinkedList<>();
+        this.isHumanCurrentlyPlaying = false;
+        this.humanCurrMove = new LinkedList<>();
         InputStream inputStream = getClass().getResourceAsStream(boardPath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line = null;
@@ -40,7 +54,11 @@ public class Board {
         }
         this.scoreFrequency = new ScoreFrequency("tiles.txt");
         this.dictionary = new Dictionary("sowpods.txt");
+        humanMoveIndexes = new LinkedList<>();
     }
+
+
+
 
     public void fillBoard(){
         for(int i = 0; i<dimension; i++){
@@ -49,6 +67,192 @@ public class Board {
                 board[i][j] = row[j];
             }
         }
+    }
+
+    public void setFirstMove(boolean firstMove) {
+        isFirstMove = firstMove;
+    }
+
+
+    public void setWordAndIndexes(){
+        humanMoveIndexes.clear();
+        StringBuilder stringBuilder = new StringBuilder("");
+        int x = humanCurrMove.getFirst()[0];
+        int y = humanCurrMove.getFirst()[1];
+        int x1 = x;
+        int y1 = y;
+        if(isHumanMovingHorizontal){
+            stringBuilder.append(findExistingWord(x,y,'L'));
+            y1 -=  stringBuilder.length();
+            stringBuilder.append(getChar(x,y));
+            stringBuilder.append(findExistingWord(x,y,'R'));
+            wordPlayedByHuman = stringBuilder.toString();
+            System.out.println("uhuh "+wordPlayedByHuman);
+            for(int i = 0; i<stringBuilder.length(); i++){
+                humanMoveIndexes.add(new int[]{x1,y1+i});
+                System.out.println("gfhgfhg"+humanMoveIndexes);
+            }
+        }else {
+            stringBuilder.append(findExistingWord(x,y,'U'));
+            x1 -= stringBuilder.length();
+            stringBuilder.append(getChar(x,y));
+            stringBuilder.append(findExistingWord(x,y,'D'));
+            wordPlayedByHuman = stringBuilder.toString();
+            for(int i = 0; i<stringBuilder.length(); i++){
+                humanMoveIndexes.add(new int[]{x1+i,y1});
+            }
+        }
+    }
+
+    public String getWordPlayedByHuman() {
+        setWordAndIndexes();
+        return wordPlayedByHuman;
+    }
+
+    public void setWordPlayedByHuman(String wordPlayedByHuman) {
+        this.wordPlayedByHuman = wordPlayedByHuman;
+    }
+
+    public LinkedList<int[]> getHumanMoveIndexes() {
+        return humanMoveIndexes;
+    }
+
+    public boolean isNewCharSelected() {
+        return newCharSelected;
+    }
+
+    public void setNewCharSelected(boolean newCharSelected) {
+        this.newCharSelected = newCharSelected;
+    }
+
+    public LinkedList<int[]> getHumanCurrMove() {
+        return humanCurrMove;
+    }
+
+    public void setHumanCurrentPlayingChar(char humanCurrentPlayingChar) {
+        this.humanCurrentPlayingChar = humanCurrentPlayingChar;
+    }
+
+    public boolean isAdjacentPlay(int x, int y){
+        int up = x - 1;
+        int down = x+1;
+        int left = y-1;
+        int right = y+1;
+
+        if(up>=0 && existChar(up,y)){
+            return true;
+        }else if(down<dimension && existChar(down,y)){
+            return true;
+        }else if(left >= 0 && existChar(x,left)){
+            return true;
+        }else if(right<dimension && existChar(x,right)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isLegalHumanMove(){
+        if(humanCurrentPlayingChar == (char)0){
+            return false;
+        }
+        if(isHumanMovingHorizontal){
+            System.out.println(isHumanMovingHorizontal);
+            if(humanCurrMove.size()==1){
+                int x = humanCurrMove.getLast()[0];
+                int y = humanCurrMove.getLast()[1];
+                if(!isFirstMove && !isAdjacentPlay(x,y)){
+                    return false;
+                }
+            }
+            if(humanCurrMove.size()>1){
+                if(humanCurrMove.getLast()[0] != humanCurrMove.getFirst()[0]){
+                    System.out.println(humanCurrMove.getLast()[0]+" "+humanCurrMove.getFirst()[0]);
+                    return false;
+                }
+            }
+            int x = humanCurrMove.getLast()[0];
+            int y = humanCurrMove.getLast()[1];
+
+            if(!isFirstMove && !legalAcrossMove(x,y,humanCurrentPlayingChar)){
+                return false;
+            }
+        }else {
+            rotateBoard();
+            if(humanCurrMove.size()==1){
+                int x = dimension - humanCurrMove.getLast()[1]-1;
+                int y = humanCurrMove.getLast()[0];
+                if(!isFirstMove && !isAdjacentPlay(x,y)){
+                    rotateBack();
+                    System.out.println("move okay");
+                    return false;
+                }
+            }
+            if(humanCurrMove.size()>1){
+                int x1 = dimension - humanCurrMove.getLast()[1]-1;
+                int x2 = dimension - humanCurrMove.getFirst()[1]-1;
+                if(x1 != x2){
+                    rotateBack();
+                    return false;
+                }
+            }
+            int x = dimension - humanCurrMove.getLast()[1]-1;
+            int y = humanCurrMove.getLast()[0];
+            if(!isFirstMove && !legalAcrossMove(x,y,humanCurrentPlayingChar)){
+                rotateBack();
+                return false;
+            }
+            if(isRotated){
+                rotateBack();
+                System.out.println("rotated");
+            }
+        }
+        return true;
+    }
+
+    public char getHumanCurrentPlayingChar() {
+        return humanCurrentPlayingChar;
+    }
+
+    public void putChar(char c, int x, int y){
+     //   System.out.println("The char is: "+c);
+        //String str = board[x][y].replaceFirst(".",""+c);
+        StringBuilder str = new StringBuilder(board[x][y]);
+        for(int i = 0; i<str.length(); i++){
+            if(str.charAt(i) == '.'){
+                str.replace(i,i+1,""+c);
+                break;
+            }
+        }
+        board[x][y] = str.toString();
+    }
+
+    public void removeChar(int x, int y){
+        char c1 = board[x][y].charAt(0);
+        char c2 = board[x][y].charAt(1);
+
+        if((c1>='a' && c1<='z') || (c1>='A' && c1<= 'Z')){
+            String str = board[x][y].replaceFirst(""+c1, ".");
+            board[x][y] = str;
+        }else if((c2>='a' && c2<='z') || (c2>='A' && c2<= 'Z')){
+            String str = board[x][y].replaceFirst(""+c2,".");
+            board[x][y] = str;
+        }
+    }
+
+    public void setHumanCurrentlyPlaying(boolean humanCurrentlyPlaying) {
+        isHumanCurrentlyPlaying = humanCurrentlyPlaying;
+    }
+
+    public boolean isHumanCurrentlyPlaying() {
+        return isHumanCurrentlyPlaying;
+    }
+
+    public boolean isHumanMovingHorizontal() {
+        return isHumanMovingHorizontal;
+    }
+
+    public void setHumanMovingHorizontal(boolean humanMovingHorizontal) {
+        isHumanMovingHorizontal = humanMovingHorizontal;
     }
 
     public void rotateBoard(){
@@ -64,7 +268,7 @@ public class Board {
 
     public char getChar(int x, int y){
         if(existChar(x,y)){
-            if((board[x][y].charAt(0)>='a' && board[x][y].charAt(0)<='z')){
+            if((board[x][y].charAt(0)>='a' && board[x][y].charAt(0)<='z') || (board[x][y].charAt(0)>='A' && board[x][y].charAt(0)<='Z')){
                 return board[x][y].charAt(0);
             }else {
                 return board[x][y].charAt(1);
@@ -76,7 +280,9 @@ public class Board {
     public boolean existChar(int x, int y){
         //System.out.println(board[x][y]);
         if((x<dimension && x>=0 && y<dimension && y>=0) && ((board[x][y].charAt(0)>='a' && board[x][y].charAt(0)<='z')||
-                (board[x][y].charAt(1)>='a' && board[x][y].charAt(1)<='z'))){
+                (board[x][y].charAt(1)>='a' && board[x][y].charAt(1)<='z') ||
+                (board[x][y].charAt(0)>='A' && board[x][y].charAt(0)<='Z')||
+                (board[x][y].charAt(1)>='A' && board[x][y].charAt(1)<='Z'))){
             return true;
         }
         return false;
@@ -132,7 +338,7 @@ public class Board {
             if(isRotated){
                 stringBuilder.reverse();
             }
-            if(!dictionary.doesWordExist(stringBuilder.toString())){
+            if(!dictionary.doesWordExist(stringBuilder.toString().toLowerCase())){
                return false;
             }
         }else if(i-1>=0 && existChar(i-1,j)){
@@ -141,7 +347,7 @@ public class Board {
             if(isRotated){
                 stringBuilder.reverse();
             }
-            if(!dictionary.doesWordExist(stringBuilder.toString())){
+            if(!dictionary.doesWordExist(stringBuilder.toString().toLowerCase())){
                 return false;
             }
         }else if(i+1<dimension && existChar(i+1,j)){
@@ -150,7 +356,7 @@ public class Board {
             if(isRotated){
                 stringBuilder.reverse();
             }
-            if(!dictionary.doesWordExist(stringBuilder.toString())){
+            if(!dictionary.doesWordExist(stringBuilder.toString().toLowerCase())){
                // System.out.println(stringBuilder.toString() + " "+i+" "+j);
                 return false;
             }
@@ -192,6 +398,18 @@ public class Board {
         int x = arr[1];
         int y = dimension - arr[0]-1;
         return new int[]{x,y};
+    }
+
+    public void updateBoard(String word, LinkedList<int[]> coordinates){
+        int putCount = 0;
+        for(int [] arr: coordinates){
+            if(!existChar(arr[0],arr[1])){
+                putChar(word.charAt(putCount),arr[0],arr[1]);
+                putCount++;
+            }else {
+                putCount++;
+            }
+        }
     }
 
     public String[][] getBoard(){
@@ -252,7 +470,11 @@ public class Board {
     }
 
     private int getLetterScore(char c, int x, int y){
-        int score = this.scoreFrequency.getScoreMap().get(c);
+        int score = 0;
+        if(!(c>='A' && c <= 'Z')){
+         //   System.out.println("getting score for "+c);
+            score = this.scoreFrequency.getScoreMap().get(c);
+        }
         char c1 = board[x][y].charAt(1);
         if(!existChar(x,y) && c1>='0' && c1<='9'){
             score = score*(c1-'0');
