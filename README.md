@@ -75,6 +75,7 @@ Place all letters in the pouch, or facedown beside the board, and mix them up. D
 
 **Features not implemented**  
 * Use of own dictionary. You can't use use your own dictionary to play the game. There is a dictionary provided with the game that you will have to use.
+
 ---
 
 **Solver**
@@ -83,6 +84,7 @@ Place all letters in the pouch, or facedown beside the board, and mix them up. D
 * Please use the complete absolute file path name of the input text.
 * The output file with best move made on board should be in the same directory as the input file.
 * Two examples of the input file and output file are provided in the resource folder.
+
 ---
 
 **A small bug and way to avoid**  
@@ -108,6 +110,7 @@ Place all letters in the pouch, or facedown beside the board, and mix them up. D
 * The left part of the word means that the part that is going to be on the left of the anchor square.
 * Each left part is then extended to right to make the complete word.
 * Recursive call and using all the anchors squares ensure that the move is the best possible move.
+
 ---
 
 ![](Resources/view1.png)
