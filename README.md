@@ -1,19 +1,19 @@
 Scrabble   
 ===
 
-*Game Rules*  
+**Game Rules**  
 
-*The rules of the game is taken from [Scrabble Game Rules (Hasbro Official Board Game Rules](https://scrabble.hasbro.com/en-us/rules)  
-*We will follow all the rules except for challeging and exchanging tile from the tray    
+*The rules of the game is taken from [Scrabble Game Rules (Hasbro Official Board Game Rules](https://scrabble.hasbro.com/en-us/rules)*  
+*We will follow all the rules except for challeging and exchanging tile from the tray*    
 
-*Set up*  
+**Set up**  
 You should have a game board, 100 letter tiles, a letter bag, and four racks.  
 
 Before the game begins, all players should agree upon the dictionary that they will use, in case of a challenge. All words labeled as a part of speech (including those listed of foreign origin, and as archaic, obsolete, colloquial, slang, etc.) are permitted with the exception of the following: words always capitalized, abbreviations, prefixes and suffixes standing alone, words requiring a hyphen or an apostrophe.  
 
 Place all letters in the pouch, or facedown beside the board, and mix them up. Draw for first play. The player with the letter closest to "A" plays first. A blank tile beats any letter. Return the letters to the pool and remix. All players draw seven new letters and place them on their racks.  
 
-*Game Play*  
+**Game Play**  
 
 * The first player combines two or more of his or her letters to form a word and places it on the board to read either across or down with one letter on the center square. Diagonal words are not allowed.
 
@@ -36,7 +36,7 @@ Place all letters in the pouch, or facedown beside the board, and mix them up. D
 
 * The game ends when all letters have been drawn and one player uses his or her last letter; or when all possible plays have been made.  
 
-*Scoring*  
+**Scoring**  
 
 * Use a score pad or piece of paper to keep a tally of each player's score, entering it after each turn. The score value of each letter is indicated by a number at the bottom of the tile. The score value of a blank is zero.
 
@@ -60,7 +60,7 @@ Place all letters in the pouch, or facedown beside the board, and mix them up. D
 
 ---
 
-*How to play*
+**How to play**
 * For making any move, first click on the "Select Move" button.  
 * After choosing "Horizontal" or "Vertical", click on the tile you want to play and then click on the board where you want to play.  
 * Always start making move with a square adjacent to an existing letter if it's not the first move. 
@@ -73,35 +73,35 @@ Place all letters in the pouch, or facedown beside the board, and mix them up. D
 
 ---
 
-*Features not implemented*
+**Features not implemented**  
 * Use of own dictionary. You can't use use your own dictionary to play the game. There is a dictionary provided with the game that you will have to use.
 ---
 
-*Solver*
+**Solver**
 * The solver .jar finds the best move for a given board and rack.
 * It takes a file path name (used Scanner) to find the input file.
 * Please use the complete absolute file path name of the input text.
 * The output file with best move made on board should be in the same directory as the input file.
-* Two examples of the input file and output file are provided in the resource folder. 
+* Two examples of the input file and output file are provided in the resource folder.
 ---
 
-*A small bug and way to avoid*
+**A small bug and way to avoid**  
 *If you clone the entire repo and try to play the game compiling manually without using the .jar file, please move the .txt files from resources directory to the same directory as .java source files. Otherwise the program won't run.*  
 
 ---
 
-*Design choices*  
+**Design choices**  
 * Strategy pattern has been used. Tile bag and Tray both are created from Tile list as parent, Computer Player is created from Player as Parent.
 * Data structure used in the game is Trie and a backtracking algorigthm has been used to find the best possible move. 
 
-*Trie*
+**Trie**
 * Trie is a prefix tree.
 * The root node has 26 nodes each representing one letter.
 * Each node also has 26 nodes.
 * A wrod is made travelling through the node.
 * To make it faster, array of size 26 is used to make 26 children nodes. Random access property of the array makes the search faster.
 
-*Backtracking algorithm*
+**Backtracking algorithm**
 * The algorithm starts by finding anchor squares.
 * Anchor squares are squares adjacent to the already placed words.
 * The left part of the word is made first using a recursive method.
