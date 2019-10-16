@@ -28,7 +28,6 @@ public class GameGui extends Application {
         //If human doesn't want to play return empty string and linkedlist
         stage.setTitle("Scrabble");
 
-
         GameManager gameManager = new GameManager();
 
 
