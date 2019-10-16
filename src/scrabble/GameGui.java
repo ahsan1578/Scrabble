@@ -1,3 +1,12 @@
+/**
+ * @author D M Raisul Ahsan
+ * @version 1.0
+ *
+ * This class is responsible for showing the current state of the game in a graphical interface
+ */
+
+
+
 package scrabble;
 
 import javafx.application.Application;
@@ -25,7 +34,6 @@ public class GameGui extends Application {
     }
 
     public void start(Stage stage){
-        //If human doesn't want to play return empty string and linkedlist
         stage.setTitle("Scrabble");
 
         GameManager gameManager = new GameManager();
@@ -77,7 +85,6 @@ public class GameGui extends Application {
                     gameManager.getBoard().setHumanCurrentlyPlaying(true);
                     humanTray.setMakeMoveOn(true);
                     if(result.get().equals("Horizontal")){
-                        System.out.println("Moving horizontal");
                         gameManager.getBoard().setHumanMovingHorizontal(true);
                     }else {
                         gameManager.getBoard().setHumanMovingHorizontal(false);
@@ -95,10 +102,8 @@ public class GameGui extends Application {
             if(humanTray.isMakeMoveOn()){
                 LinkedList<Character> list = gameManager.getHumanTray().getTileList();
                 double x = event.getX();
-                System.out.println((int)x);
                 int clickedX = (int)(x/40);
                 LinkedList<Integer> played = humanTray.getPlayedTiles();
-                System.out.println(clickedX);
                 if(x<=280 && !played.contains(clickedX)){
                     if(!humanTray.isLastCharPlayed()){
                         humanTray.getPlayedTiles().removeLast();
@@ -111,14 +116,12 @@ public class GameGui extends Application {
                         if (result.isPresent()){
                             c = result.get();
                         }else {
-                            System.out.println("here");
                             played.removeLast();
                             c = (char)0;
                         }
                     }
                     gameManager.getBoard().setNewCharSelected(true);
                     gameManager.getBoard().setHumanCurrentPlayingChar(c);
-                    System.out.println(humanTray.getPlayedTiles());
                     humanTray.draw();
                 }
             }else {
@@ -134,16 +137,11 @@ public class GameGui extends Application {
                 int [] arr = gameManager.getBoard().getHumanCurrMove().getLast();
                 gameManager.getBoard().removeChar(arr[0],arr[1]);
                 boardGui.draw();
-                System.out.println("hereeeeeee");
                 gameManager.getBoard().getHumanCurrMove().removeLast();
                 humanTray.getPlayedTiles().removeLast();
                 humanTray.draw();
             }
         });
-
-
-        ///done human tray list empty. humantray makemoveon, board humancurrentlyplaying char, board ishumancurrentlyplayin
-        //board played list
 
 
         Alert illegalChoice = new Alert(Alert.AlertType.WARNING);
@@ -169,14 +167,10 @@ public class GameGui extends Application {
                     gameManager.getBoard().getHumanCurrMove().add(new int[]{indexX, indexY});
                     if(gameManager.getBoard().isLegalHumanMove()){
                         gameManager.getBoard().putChar(gameManager.getBoard().getHumanCurrentPlayingChar(),indexX,indexY);
-                        System.out.println(gameManager.getBoard().toString());
                         gameManager.getBoard().setNewCharSelected(false);
                         humanTray.setLastCharPlayed(true);
                         boardGui.draw();
                         LinkedList<int[]> list = gameManager.getBoard().getHumanCurrMove();
-                        for(int [] arr: list){
-                            System.out.println(arr[0]+"   "+arr[1]);
-                        }
                     }else {
                         humanTray.setLastCharPlayed(true);
                         gameManager.getBoard().setNewCharSelected(false);
@@ -204,120 +198,88 @@ public class GameGui extends Application {
         Button doneButton = new Button("Make Move");
         doneButton.setStyle("-fx-background-color: #021b45; -fx-text-fill: white; -fx-font-size: 17px");
         doneButton.setOnMouseClicked(event -> {
-            String word = gameManager.getBoard().getWordPlayedByHuman();
-            if(gameManager.getBoard().getHumanCurrMove().size() == 0){
-                noWord.showAndWait();
-            }else {
-                if(!gameManager.continuousHumanMove()){
-                    System.out.println("This is human word: "+word);
-                    System.out.println("Not cont");
-                    LinkedList<int[]> list = gameManager.getBoard().getHumanMoveIndexes();
-                    for(int [] arr: list){
-                        System.out.println(arr[0]+"    "+arr[1]);
-                    }
-                    System.out.println(gameManager.getBoard().getHumanMoveIndexes().size());
-                    LinkedList<int[]> list1 = gameManager.getBoard().getHumanCurrMove();
-                    for(int [] arr: list1){
-                        System.out.println(arr[0]+"    "+arr[1]);
-                    }
-                    for(int[] arr: gameManager.getBoard().getHumanCurrMove()){
-                        gameManager.getBoard().removeChar(arr[0],arr[1]);
-                    }
-                    illegalChoice.showAndWait();
-                }else if(gameManager.isFirstMove() &&
-                        (!gameManager.getBoard().existChar(gameManager.getBoard().getDimension()/2, gameManager.getBoard().getDimension()/2) ||
-                                gameManager.getBoard().getHumanCurrMove().size()<2)){
-                    for(int[] arr: gameManager.getBoard().getHumanCurrMove()){
-                        gameManager.getBoard().removeChar(arr[0],arr[1]);
-                    }
-                    illegalChoice.showAndWait();
-                } else if(!gameManager.isAFinalValidWordByHuman(word)){
-                    System.out.println("This is human word: "+word);
-                    System.out.println("Not valid word");
-                    for(int[] arr: gameManager.getBoard().getHumanCurrMove()){
-                        gameManager.getBoard().removeChar(arr[0],arr[1]);
-                    }
-                    notValidWord.showAndWait();
+            if(humanTray.isMakeMoveOn()){
+                String word = gameManager.getBoard().getWordPlayedByHuman();
+                if(gameManager.getBoard().getHumanCurrMove().size() == 0){
+                    noWord.showAndWait();
                 }else {
-                    gameManager.getBoard().setFirstMove(false);
-                    gameManager.setFirstMove(false);
-                    boolean allTilesUsed = false;
-                    if(humanTray.getPlayedTiles().size() == 7){
-                        allTilesUsed = true;
-                    }
-                    for(int[] arr: gameManager.getBoard().getHumanCurrMove()){
-                        gameManager.getBoard().removeChar(arr[0],arr[1]);
-                    }
-                    int score = gameManager.getHumanScore();
-                    //System.out.println(gameManager.getBoard().getWordPlayedByHuman());
-                    score = score + gameManager.getBoard().getTotalScore(gameManager.getBoard().getHumanMoveIndexes(), word,allTilesUsed);
-                    gameManager.setHumanScore(score);
-                    for(int i:humanTray.getPlayedTiles()){
-                        System.out.println("Check human tray "+gameManager.getHumanPlayer().getTray().getTileList());
-                        gameManager.getHumanPlayer().getTray().getTileList().set(i, '?');
-                    }
-                    gameManager.getHumanPlayer().getTray().getTileList().removeAll(Collections.singletonList((Character)'?'));
-                    if(gameManager.getTileBag().getSize()>=humanTray.getPlayedTiles().size()){
-                        gameManager.getHumanTray().addRandomTiles(humanTray.getPlayedTiles().size(),gameManager.getTileBag());
-                    }else if(gameManager.getTileBag().getSize()>0){
-                        gameManager.getHumanTray().addRandomTiles(gameManager.getTileBag().getSize(),gameManager.getTileBag());
-                    }
-                    gameManager.getHumanPlayer().setNextMoveWord(word);
-                    gameManager.getHumanPlayer().setNextMoveCoordinates(gameManager.getBoard().getHumanMoveIndexes());
-                    gameManager.setHumanGaveUpTurn(false);
-                    gameManager.play();
-                    scoreBoard.setComputerScore(gameManager.getComScore());
-                    scoreBoard.setHumanScore(gameManager.getHumanScore());
-                    scoreBoard.draw();
-                    if(gameManager.isGameOver()){
-
-                        String str = "Your score: "+gameManager.getHumanScore()+"\nComputer score: "+gameManager.getComScore();
-                        if(gameManager.getWinner().equals(gameManager.getComputerPlayer())){
-                            gameOver.setContentText("Sorry! You lost!\n"+str);
-                        }else if(gameManager.getWinner().equals(gameManager.getHumanPlayer())){
-                            gameOver.setContentText("Congratulations! You won!\n"+str);
-                        }else {
-                            gameOver.setContentText("Scores tied\n"+str);
+                    if(!gameManager.continuousHumanMove()){
+                        LinkedList<int[]> list = gameManager.getBoard().getHumanMoveIndexes();
+                        LinkedList<int[]> list1 = gameManager.getBoard().getHumanCurrMove();
+                        for(int[] arr: gameManager.getBoard().getHumanCurrMove()){
+                            gameManager.getBoard().removeChar(arr[0],arr[1]);
                         }
-                        gameOver.showAndWait();
-                        stage.close();
-                    }
-//                    int putCount = 0;
-//                    for(int [] arr: gameManager.getBoard().getHumanMoveIndexes()){
-//                        if(!gameManager.getBoard().existChar(arr[0],arr[1])){
-//                            gameManager.getBoard().putChar(word.charAt(putCount),arr[0],arr[1]);
-//                            putCount++;
-//                        }else {
-//                            putCount++;
-//                        }
-//                    }
-                }
-                humanTray.setLastCharPlayed(true);
-                humanTray.setMakeMoveOn(false);
-                gameManager.getBoard().setNewCharSelected(false);
-                gameManager.getBoard().setHumanMovingHorizontal(false);
-                gameManager.getBoard().setHumanCurrentlyPlaying(false);
-                gameManager.getBoard().getHumanCurrMove().clear();
-                gameManager.getBoard().getHumanMoveIndexes().clear();
-                gameManager.getBoard().setWordPlayedByHuman("");
-                humanTray.getPlayedTiles().clear();
-                boardGui.draw();
-                humanTray.draw();
+                        illegalChoice.showAndWait();
+                    }else if(gameManager.isFirstMove() &&
+                            (!gameManager.getBoard().existChar(gameManager.getBoard().getDimension()/2, gameManager.getBoard().getDimension()/2) ||
+                                    gameManager.getBoard().getHumanCurrMove().size()<2)){
+                        for(int[] arr: gameManager.getBoard().getHumanCurrMove()){
+                            gameManager.getBoard().removeChar(arr[0],arr[1]);
+                        }
+                        illegalChoice.showAndWait();
+                    } else if(!gameManager.isAFinalValidWordByHuman(word)){
+                        for(int[] arr: gameManager.getBoard().getHumanCurrMove()){
+                            gameManager.getBoard().removeChar(arr[0],arr[1]);
+                        }
+                        notValidWord.showAndWait();
+                    }else {
+                        gameManager.getBoard().setFirstMove(false);
+                        gameManager.setFirstMove(false);
+                        boolean allTilesUsed = false;
+                        if(humanTray.getPlayedTiles().size() == 7){
+                            allTilesUsed = true;
+                        }
+                        for(int[] arr: gameManager.getBoard().getHumanCurrMove()){
+                            gameManager.getBoard().removeChar(arr[0],arr[1]);
+                        }
+                        int score = gameManager.getHumanScore();
+                        score = score + gameManager.getBoard().getTotalScore(gameManager.getBoard().getHumanMoveIndexes(), word,allTilesUsed);
+                        gameManager.setHumanScore(score);
+                        for(int i:humanTray.getPlayedTiles()){
+                            gameManager.getHumanPlayer().getTray().getTileList().set(i, '?');
+                        }
+                        gameManager.getHumanPlayer().getTray().getTileList().removeAll(Collections.singletonList((Character)'?'));
+                        if(gameManager.getTileBag().getSize()>=humanTray.getPlayedTiles().size()){
+                            gameManager.getHumanTray().addRandomTiles(humanTray.getPlayedTiles().size(),gameManager.getTileBag());
+                        }else if(gameManager.getTileBag().getSize()>0){
+                            gameManager.getHumanTray().addRandomTiles(gameManager.getTileBag().getSize(),gameManager.getTileBag());
+                        }
+                        gameManager.getHumanPlayer().setNextMoveWord(word);
+                        gameManager.getHumanPlayer().setNextMoveCoordinates(gameManager.getBoard().getHumanMoveIndexes());
+                        gameManager.setHumanGaveUpTurn(false);
+                        gameManager.play();
+                        scoreBoard.setComputerScore(gameManager.getComScore());
+                        scoreBoard.setHumanScore(gameManager.getHumanScore());
+                        scoreBoard.setRemainingTiles(gameManager.getTileBag().getSize());
+                        scoreBoard.draw();
+                        if(gameManager.isGameOver()){
 
+                            String str = "Your score: "+gameManager.getHumanScore()+"\nComputer score: "+gameManager.getComScore();
+                            if(gameManager.getWinner().equals(gameManager.getComputerPlayer())){
+                                gameOver.setContentText("Sorry! You lost!\n"+str);
+                            }else if(gameManager.getWinner().equals(gameManager.getHumanPlayer())){
+                                gameOver.setContentText("Congratulations! You won!\n"+str);
+                            }else {
+                                gameOver.setContentText("Scores tied\n"+str);
+                            }
+                            gameOver.showAndWait();
+                            stage.close();
+                        }
+                    }
+                    humanTray.setLastCharPlayed(true);
+                    humanTray.setMakeMoveOn(false);
+                    gameManager.getBoard().setNewCharSelected(false);
+                    gameManager.getBoard().setHumanMovingHorizontal(false);
+                    gameManager.getBoard().setHumanCurrentlyPlaying(false);
+                    gameManager.getBoard().getHumanCurrMove().clear();
+                    gameManager.getBoard().getHumanMoveIndexes().clear();
+                    gameManager.getBoard().setWordPlayedByHuman("");
+                    humanTray.getPlayedTiles().clear();
+                    boardGui.draw();
+                    humanTray.draw();
+                }
             }
 
-//            System.out.println(gameManager.getBoard().getWordPlayedByHuman());
-//            LinkedList<int[]> list = gameManager.getBoard().getHumanMoveIndexes();
-//            for(int [] arr: list){
-//                System.out.println(arr[0]+"    "+arr[1]);
-//            }
-//
-//            LinkedList<int[]> list1 = gameManager.getBoard().getHumanCurrMove();
-//            for(int [] arr: list1){
-//                System.out.println(arr[0]+"    "+arr[1]);
-//            }
-//            System.out.println(gameManager.continuousHumanMove());
-//            System.out.println(gameManager.isAFinalValidWordByHuman());
         });
 
         Alert noGiveUP = new Alert(Alert.AlertType.WARNING);
@@ -335,6 +297,7 @@ public class GameGui extends Application {
                 gameManager.play();
                 scoreBoard.setComputerScore(gameManager.getComScore());
                 scoreBoard.setHumanScore(gameManager.getHumanScore());
+                scoreBoard.setRemainingTiles(gameManager.getTileBag().getSize());
                 scoreBoard.draw();
                 if(gameManager.isGameOver()){
                     String str = "Your score: "+gameManager.getHumanScore()+"\nComputer score: "+gameManager.getComScore();

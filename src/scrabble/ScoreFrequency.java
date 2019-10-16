@@ -1,3 +1,11 @@
+/**
+ * @author D M Raisul Ahsan
+ * @version 1.0
+ *
+ * This class maps the scores and number of tiles for a particular letter
+ */
+
+
 package scrabble;
 
 import java.io.BufferedReader;
@@ -10,6 +18,10 @@ public class ScoreFrequency {
     private HashMap<Character, Integer> frequencyMap;
 
 
+    /**
+     * Constructs the map taking information about scores and frequency from a file
+     * @param frequencyScoreFilePath the file path
+     */
     public ScoreFrequency(String frequencyScoreFilePath){
         this.scoreMap = new HashMap<>();
         this.frequencyMap = new HashMap<>();
@@ -28,18 +40,18 @@ public class ScoreFrequency {
         }
     }
 
+    /**
+     * @return the map that maps the number of tiles for each letter
+     */
     public HashMap<Character, Integer> getFrequencyMap() {
         return frequencyMap;
     }
 
+    /**
+     * @return the map that maps the score each letter
+     */
     public HashMap<Character, Integer> getScoreMap() {
         return scoreMap;
-    }
-
-    public static void main(String[] args) {
-        ScoreFrequency scoreFrequency = new ScoreFrequency("tiles.txt");
-        System.out.println(scoreFrequency.frequencyMap);
-        System.out.println(scoreFrequency.scoreMap);
     }
 }
 

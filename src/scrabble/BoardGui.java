@@ -1,3 +1,11 @@
+/**
+ * @author D M Raisul Ahsan
+ * @version 1.0
+ *
+ * This class creates the graphical representation of the Board
+ */
+
+
 package scrabble;
 
 import javafx.scene.canvas.Canvas;

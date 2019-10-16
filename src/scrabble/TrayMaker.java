@@ -1,3 +1,12 @@
+/**
+ * @author D M Raisul Ahsan
+ * @version 1.0
+ *
+ * This class creates the graphical representation of the Human Player's Tray
+ */
+
+
+
 package scrabble;
 
 import javafx.scene.canvas.Canvas;

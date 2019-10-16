@@ -1,3 +1,11 @@
+/**
+ * @author D M Raisul Ahsan
+ * @version 1.0
+ *
+ * This class controls the game and the moves, keeps the score, finds the winner
+ */
+
+
 package scrabble;
 
 import java.util.LinkedList;
@@ -22,6 +30,9 @@ public class GameManager {
     private boolean isFirstMove;
 
 
+    /**
+     * Constructs the game manager
+     */
     public GameManager(){
         this.comScore = 0;
         board = new Board("board.txt");
@@ -43,40 +54,73 @@ public class GameManager {
         this.isFirstMove = true;
     }
 
+
+
+    /**
+     * Sets true if it's the first move, false otherwise
+     * @param firstMove if it's the first move
+     */
     public void setFirstMove(boolean firstMove) {
         isFirstMove = firstMove;
     }
 
+
+
+    /**
+     * @return true if it's the first move, false otherwise
+     */
     public boolean isFirstMove() {
         return isFirstMove;
     }
 
+
+    /**
+     * @return the tilebag
+     */
     public TileBag getTileBag() {
         return tileBag;
     }
 
+
+    /**
+     * @return human player's score
+     */
     public int getHumanScore() {
         return humanScore;
     }
 
+
+    /**
+     * Sets human player's score
+     * @param humanScore human player's score
+     */
     public void setHumanScore(int humanScore) {
         this.humanScore = humanScore;
     }
 
+
+    /**
+     * @return the Board object
+     */
     public Board getBoard() {
         return board;
     }
 
+
+    /**
+     * @return human current tray
+     */
     public Tray getHumanTray() {
         return humanTray;
     }
 
-    public Tray getComputerTray() {
-        return computerTray;
-    }
 
+    /**
+     * Checks if the word played by human is a valid word
+     * @param word the word
+     * @return true if the word is a valid word
+     */
     public boolean isAFinalValidWordByHuman(String word){
-     //   String word = board.getWordPlayedByHuman();
         if(dictionary.doesWordExist(word.toLowerCase())){
             return true;
         }else {
@@ -84,8 +128,12 @@ public class GameManager {
         }
     }
 
+
+    /**
+     * Checks if there is any gap squares in the human move
+     * @return true if there is no gap squares
+     */
     public boolean continuousHumanMove(){
-    //    board.setWordAndIndexes();
         LinkedList<int[]> moveIndex = board.getHumanCurrMove();
         LinkedList<int[]> wordIndex = board.getHumanMoveIndexes();
         for(int [] arr : moveIndex){
@@ -103,26 +151,13 @@ public class GameManager {
         return true;
     }
 
-    public void setHumanMoveCoordinates(LinkedList<int[]> coordinates){
-        humanPlayer.setNextMoveCoordinates(coordinates);
-    }
 
-    public void setComMoveCoordinates(LinkedList<int[]> comMoveCoordinates){
-        computerPlayer.setNextMoveCoordinates(comMoveCoordinates);
-    }
-
-    public void setTurn(char turn) {
-        this.turn = turn;
-    }
-
-    public boolean isGameOver() {
-        return isGameOver;
-    }
-
-    public void setGameOver(boolean gameOver) {
-        isGameOver = gameOver;
-    }
-
+    /**
+     * Checks if the game is over
+     * @param humanPlayer the human player
+     * @param computerPlayer the computer player
+     * @return true if the game is over
+     */
     public boolean checkGameOver(Player humanPlayer, Player computerPlayer){
         if(tileBag.getSize() == 0 &&(humanPlayer.getTray().getSize() == 0 || computerPlayer.getTray().getSize() == 0)){
             return true;
@@ -133,6 +168,10 @@ public class GameManager {
         return false;
     }
 
+
+    /**
+     * Finds the winners and end scores
+     */
     public void setWinner() {
         int comDeductScore = 0;
         int humDeductScore = 0;
@@ -171,20 +210,38 @@ public class GameManager {
         }
     }
 
+
+    /**
+     * @return computer player
+     */
     public Player getComputerPlayer() {
         return computerPlayer;
     }
 
+
+    /**
+     * @return human player
+     */
     public Player getHumanPlayer() {
         return humanPlayer;
     }
 
+
+    /**
+     * Sets true if human gave up the turn
+     * @param humanGaveUpTurn if human gave up the turn
+     */
     public void setHumanGaveUpTurn(boolean humanGaveUpTurn) {
         this.humanGaveUpTurn = humanGaveUpTurn;
     }
 
+
+    /**
+     * Sets the computer tray with new letters
+     * @param word the last word computer played
+     * @param coordinates indexes of the word
+     */
     public void setComputerTray(String word, LinkedList<int[]> coordinates){
-        System.out.println("vfdhbfhbv "+word );
         LinkedList<Character> list = new LinkedList<>();
         int count = 0;
         for(int[] arr:coordinates){
@@ -202,36 +259,49 @@ public class GameManager {
                 computerTray.getTileList().removeFirstOccurrence(c);
             }
         }
-        System.out.println("This list is "+list);
         if(tileBag.getSize()>=list.size()){
             computerTray.addRandomTiles(list.size(),tileBag);
         }else if(tileBag.getSize()>0){
             computerTray.addRandomTiles(tileBag.getSize(),tileBag);
         }
-        System.out.println("The computer tray: "+computerTray.getTileList());
         computerPlayer.setTray(computerTray);
-        System.out.println("computer tray "+computerPlayer.getTray().getTileList());
     }
 
+
+    /**
+     * @return computer score
+     */
     public int getComScore() {
         return comScore;
     }
 
+
+    /**
+     * @return the winner
+     */
     public Player getWinner() {
         return winner;
     }
 
+    /**
+     * @return true if game is over
+     */
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    /**
+     * Alternate moves and updates board, checks if the game is over
+     */
     public void play(){
         if(!isGameOver && turn == 'H'){
             if(humanGaveUpTurn){
-                System.out.println("Human doesn't have any move");
                 lastWordPlayedByHuman = "";
                 turn = 'C';
             }else {
                 String word = humanPlayer.getNextMoveWord();
                 LinkedList<int[]> coordinates = humanPlayer.getNextMoveCoordinates();
                 if(word.length()>0){
-                    System.out.println("This is human word: "+word);
                     board.updateBoard(word,coordinates);
                     turn = 'C';
                 }else {
@@ -241,10 +311,8 @@ public class GameManager {
         }
 
         if(!isGameOver && turn == 'C'){
-            System.out.println("Here 1: "+computerPlayer.getTray().getTileList());
             computerPlayer.setNextMoveWordAndCoordinates();
             if(computerPlayer.isNoMove()){
-                System.out.println("Computer doesn't have any move");
                 lastWordPlayedByComputer = "";
                 turn = 'H';
             }else {
@@ -258,18 +326,13 @@ public class GameManager {
                 }else{
                     turn = 'C';
                 }
-                System.out.println("here 2: "+computerPlayer.getTray().getTileList());
-                System.out.println(tileBag.getSize());
                 lastWordPlayedByComputer = word;
             }
 
         }
         if(checkGameOver(humanPlayer,computerPlayer)){
-            System.out.println("The game is over");
             isGameOver = true;
             setWinner();
         }
-        System.out.println("Human "+humanScore);
-        System.out.println("Computer "+comScore);
     }
 }
