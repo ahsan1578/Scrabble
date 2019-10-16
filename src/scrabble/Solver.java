@@ -209,6 +209,10 @@ public class Solver {
         System.out.println("The word is bhgh"+word);
     }
 
+    public void processInputFile(String filename){
+
+    }
+
     public int getScore() {
         return score;
     }

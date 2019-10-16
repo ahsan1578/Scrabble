@@ -213,7 +213,13 @@ public class GameManager {
         System.out.println("computer tray "+computerPlayer.getTray().getTileList());
     }
 
+    public int getComScore() {
+        return comScore;
+    }
 
+    public Player getWinner() {
+        return winner;
+    }
 
     public void play(){
         if(!isGameOver && turn == 'H'){

@@ -20,7 +20,7 @@ public class TrayMaker extends Canvas {
         this.tray = tray;
         gc = this.getGraphicsContext2D();
         this.setHeight(50);
-        this.setWidth(550);
+        this.setWidth(350);
         playedTiles =new LinkedList<>();
         isMakeMoveOn = false;
     }

@@ -5,10 +5,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -16,6 +13,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -28,6 +26,7 @@ public class GameGui extends Application {
 
     public void start(Stage stage){
         //If human doesn't want to play return empty string and linkedlist
+        stage.setTitle("Scrabble");
 
 
         GameManager gameManager = new GameManager();
@@ -41,6 +40,8 @@ public class GameGui extends Application {
         TrayMaker humanTray = new TrayMaker(gameManager.getHumanTray());
         humanTray.draw();
 
+        ScoreBoard scoreBoard = new ScoreBoard();
+        scoreBoard.draw();
 
         List<Character> letterChoices = new ArrayList<>();
         for(int i = 'A'; i<='Z'; i++){
@@ -61,11 +62,12 @@ public class GameGui extends Application {
 
         Alert notMakingMove = new Alert(Alert.AlertType.WARNING);
         notMakingMove.setHeaderText(null);
-        notMakingMove.setContentText("Please click on the make move button");
+        notMakingMove.setContentText("Please click on the \"Select Move\" button");
 
         Alert noAlignment = new Alert(Alert.AlertType.WARNING);
         noAlignment.setHeaderText(null);
-        noAlignment.setContentText("Please click on make move button\nand choose if you want to play horizontal or vertical.");
+        noAlignment.setContentText("Please click on \"Select Move\" button\nand choose if you want to play horizontal or vertical.");
+
 
         Button makeMoveButton =  new Button("Select Move");
         makeMoveButton.setStyle("-fx-background-color: #021b45; -fx-text-fill: white; -fx-font-size: 17px");
@@ -196,6 +198,10 @@ public class GameGui extends Application {
         notValidWord.setHeaderText(null);
         notValidWord.setContentText("Sorry! Not a valid word");
 
+        Alert gameOver = new Alert(Alert.AlertType.INFORMATION);
+        gameOver.setHeaderText("Game Over!");
+
+
         Button doneButton = new Button("Make Move");
         doneButton.setStyle("-fx-background-color: #021b45; -fx-text-fill: white; -fx-font-size: 17px");
         doneButton.setOnMouseClicked(event -> {
@@ -261,8 +267,21 @@ public class GameGui extends Application {
                     gameManager.getHumanPlayer().setNextMoveCoordinates(gameManager.getBoard().getHumanMoveIndexes());
                     gameManager.setHumanGaveUpTurn(false);
                     gameManager.play();
+                    scoreBoard.setComputerScore(gameManager.getComScore());
+                    scoreBoard.setHumanScore(gameManager.getHumanScore());
+                    scoreBoard.draw();
                     if(gameManager.isGameOver()){
-                        System.out.println("Game Over");
+
+                        String str = "Your score: "+gameManager.getHumanScore()+"\nComputer score: "+gameManager.getComScore();
+                        if(gameManager.getWinner().equals(gameManager.getComputerPlayer())){
+                            gameOver.setContentText("Sorry! You lost!\n"+str);
+                        }else if(gameManager.getWinner().equals(gameManager.getHumanPlayer())){
+                            gameOver.setContentText("Congratulations! You won!\n"+str);
+                        }else {
+                            gameOver.setContentText("Scores tied\n"+str);
+                        }
+                        gameOver.showAndWait();
+                        stage.close();
                     }
 //                    int putCount = 0;
 //                    for(int [] arr: gameManager.getBoard().getHumanMoveIndexes()){
@@ -306,6 +325,7 @@ public class GameGui extends Application {
         noGiveUP.setHeaderText(null);
         noGiveUP.setContentText("You can't give up first move");
 
+
         Button giveUpButton = new Button("Give up turn");
         giveUpButton.setStyle("-fx-background-color: #021b45; -fx-text-fill: white; -fx-font-size: 17px");
         giveUpButton.setOnMouseClicked(event1 -> {
@@ -314,8 +334,21 @@ public class GameGui extends Application {
             }else{
                 gameManager.setHumanGaveUpTurn(true);
                 gameManager.play();
+                scoreBoard.setComputerScore(gameManager.getComScore());
+                scoreBoard.setHumanScore(gameManager.getHumanScore());
+                scoreBoard.draw();
                 if(gameManager.isGameOver()){
-                    System.out.println("Game Over");
+                    String str = "Your score: "+gameManager.getHumanScore()+"\nComputer score: "+gameManager.getComScore();
+                    if(gameManager.getWinner().equals(gameManager.getComputerPlayer())){
+                        gameOver.setContentText("Sorry! You lost!\n"+str);
+                    }else if(gameManager.getWinner().equals(gameManager.getHumanPlayer())){
+                        gameOver.setContentText("Congratulations! You won!\n"+str);
+                    }else {
+                        gameOver.setContentText("Scores tied\n"+str);
+                    }
+                    gameOver.showAndWait();
+                    stage.close();
+
                 }
                 humanTray.setLastCharPlayed(true);
                 humanTray.setMakeMoveOn(false);
@@ -333,7 +366,8 @@ public class GameGui extends Application {
 
 
         HBox hBox = new HBox();
-        hBox.setPadding(new Insets(5,5,5,5));
+        hBox.setPadding(new Insets(20,10,12,10));
+        hBox.setSpacing(10);
         hBox.setStyle("-fx-background-color: #403d99");
         hBox.getChildren().add(humanTray);
         hBox.getChildren().add(makeMoveButton);
@@ -343,6 +377,7 @@ public class GameGui extends Application {
 
 
         root.setBottom(hBox);
+        root.setRight(scoreBoard);
         root.setCenter(boardGui);
         stage.setScene(new Scene(root));
         stage.show();
